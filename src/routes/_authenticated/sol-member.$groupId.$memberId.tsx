@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -172,6 +172,12 @@ function SolMemberPage() {
   return (
     <AppShell title={`Peyman: ${(member as any)?.name}`}>
       <div className="space-y-5">
+        <Link
+          to="/sol"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         {/* Resumen */}
         <div className="grid grid-cols-3 gap-3">
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-2">
@@ -216,7 +222,7 @@ function SolMemberPage() {
           <h3 className="text-lg font-semibold text-green-800 mb-3">
             Kalendriye peyman
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {Array.from({ length: (group as any)?.months || 0 }).map((_, monthIndex) => {
               const monthNumber = monthIndex + 1;
               const payment = (payments as any)?.find((p: any) => p.month_number === monthNumber);

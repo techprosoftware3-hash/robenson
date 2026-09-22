@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 
 function NotFoundComponent() {
   return (
@@ -117,10 +118,21 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+        console.log('SW registered: ', registration);
+      }).catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <PWAInstallPrompt />
     </QueryClientProvider>
   );
 }

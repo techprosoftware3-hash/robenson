@@ -1,8 +1,8 @@
 import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, Wallet, Menu, X, DollarSign, Users, FileText, LogOut as Logout } from "lucide-react";
+import { LogOut, Wallet, Menu, X, DollarSign, Users, FileText, LogOut as Logout, Moon, Sun } from "lucide-react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
@@ -21,6 +21,30 @@ export function AppShell({
   const location = useLocation();
   const { role } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Load dark mode preference from localStorage
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      setDarkMode(savedMode === 'true');
+    } else {
+      // Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setDarkMode(prefersDark);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Apply dark mode to document
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
 
   const isAdmin = role === "admin";
 
@@ -35,9 +59,13 @@ export function AppShell({
     {
       label: "Lajan mwen mete nan prè",
       icon: DollarSign,
-      path: "/admin",
+      path: "/capital",
       description: "Inversiones en préstamos",
       adminOnly: true,
+      color: "from-blue-500 to-blue-600",
+      hoverColor: "from-blue-600 to-blue-700",
+      textColor: "text-blue-700",
+      hoverBg: "hover:bg-blue-100"
     },
     {
       label: "Kliyan",
@@ -45,6 +73,10 @@ export function AppShell({
       path: "/kliyan-list",
       description: "Gestión de clientes",
       adminOnly: true,
+      color: "from-purple-500 to-purple-600",
+      hoverColor: "from-purple-600 to-purple-700",
+      textColor: "text-purple-700",
+      hoverBg: "hover:bg-purple-100"
     },
     {
       label: "Prè",
@@ -52,6 +84,10 @@ export function AppShell({
       path: "/pre-list",
       description: "Préstamos activos",
       adminOnly: false,
+      color: "from-orange-500 to-orange-600",
+      hoverColor: "from-orange-600 to-orange-700",
+      textColor: "text-orange-700",
+      hoverBg: "hover:bg-orange-100"
     },
     {
       label: "SòL",
@@ -59,6 +95,10 @@ export function AppShell({
       path: "/sol",
       description: "Sistèm préstamo rotativo",
       adminOnly: false,
+      color: "from-pink-500 to-pink-600",
+      hoverColor: "from-pink-600 to-pink-700",
+      textColor: "text-pink-700",
+      hoverBg: "hover:bg-pink-100"
     },
     {
       label: "Soti",
@@ -66,6 +106,10 @@ export function AppShell({
       path: "/",
       description: "Cerrar sesión",
       adminOnly: false,
+      color: "from-red-500 to-red-600",
+      hoverColor: "from-red-600 to-red-700",
+      textColor: "text-red-700",
+      hoverBg: "hover:bg-red-100"
     }
   ];
 
@@ -91,6 +135,13 @@ export function AppShell({
           </div>
           {right}
           <button
+            onClick={() => setDarkMode(!darkMode)}
+            aria-label="Cambiar tema"
+            className="rounded-md p-2 transition-colors hover:bg-green-800"
+          >
+            {darkMode ? <Sun className="size-5" /> : <Moon className="size-5" />}
+          </button>
+          <button
             onClick={signOut}
             aria-label="Soti"
             className="rounded-md p-2 transition-colors hover:bg-green-800"
@@ -101,9 +152,17 @@ export function AppShell({
       </header>
 
       <div className="flex">
+        {/* Overlay for mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-10 bg-black/50 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
         <aside
-          className={`fixed left-0 top-16 z-20 h-[calc(100vh-4rem)] w-64 transform border-r border-green-200 bg-white shadow-lg transition-transform duration-300 ease-in-out ${
+          className={`fixed left-0 top-16 z-20 h-[calc(100vh-4rem)] w-64 transform border-r border-green-200 bg-white shadow-lg transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -111,6 +170,10 @@ export function AppShell({
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
+              const color = (item as any).color || "from-green-500 to-emerald-600";
+              const hoverColor = (item as any).hoverColor || "from-green-600 to-emerald-700";
+              const textColor = (item as any).textColor || "text-green-700";
+              const hoverBg = (item as any).hoverBg || "hover:bg-green-100";
               return (
                 <button
                   key={item.label}
@@ -124,8 +187,8 @@ export function AppShell({
                   }}
                   className={`w-full flex items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${
                     isActive || (item.path !== "/" && location.pathname.includes(item.path))
-                      ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md"
-                      : "text-green-700 hover:bg-green-100"
+                      ? `bg-gradient-to-r ${color} text-white shadow-md`
+                      : `${textColor} ${hoverBg}`
                   }`}
                 >
                   <Icon className="size-5" />
@@ -140,13 +203,16 @@ export function AppShell({
         </aside>
 
         {/* Main content */}
-        <main className={`mx-auto max-w-3xl px-4 py-5 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
+        <main className={`mx-auto w-full px-4 py-5 transition-all duration-300 md:max-w-3xl md:px-4 ${
+          sidebarOpen ? "ml-0 md:ml-64" : "ml-0"
+        }`}>
           {children}
         </main>
       </div>
 
-      <footer className="mx-auto max-w-3xl px-4 py-4 text-center text-sm text-green-700">
+      <footer className="mx-auto max-w-3xl px-4 py-4 text-center text-sm text-white bg-gradient-to-r from-green-600 to-emerald-700">
         <p>Tel: (509) 31059832/4290398 0ZDS</p>
+        <p className="mt-1">Tout dwa reseve ak RAMA-MULTISERVICES@2026</p>
       </footer>
     </div>
   );

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Receipt, Trash2 } from "lucide-react";
+import { Receipt, Trash2, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { deleteClientAccount, resetClientPassword } from "@/lib/admin.functions";
@@ -118,6 +118,12 @@ function ClientDetail() {
   return (
     <AppShell title={profile?.full_name ?? "Kliyan"}>
       <div className="space-y-5">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         <Card className="space-y-3">
           <div className="flex items-center gap-3">
             {photoUrl ? (
@@ -140,7 +146,7 @@ function ClientDetail() {
             </div>
           </div>
           <EditProfile profile={profile} onSaved={refresh} />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button className={secondaryButtonClass} onClick={onResetPassword}>
               Chanje kòd sekrè
             </button>

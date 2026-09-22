@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search, DollarSign } from "lucide-react";
+import { Search, DollarSign, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, Card } from "@/components/AppShell";
@@ -61,8 +61,14 @@ function LoansList() {
   return (
     <AppShell title="Prè yo">
       <div className="space-y-5">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         {/* Resumen de préstamos */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-2">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="size-5" />

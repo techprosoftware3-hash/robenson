@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronRight, Plus, Search } from "lucide-react";
+import { ChevronRight, Plus, Search, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { createClientAccount } from "@/lib/admin.functions";
@@ -91,6 +91,12 @@ function ClientList() {
   return (
     <AppShell title="Lis kliyan yo">
       <div className="space-y-5">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Itilizatè yo ({users.length})</h2>
           <button className={secondaryButtonClass} onClick={() => setShowForm((v) => !v)}>

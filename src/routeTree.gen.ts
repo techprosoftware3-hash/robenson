@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedCapitalRouteImport } from './routes/_authenticated/capital'
 import { Route as AuthenticatedKliyanRouteImport } from './routes/_authenticated/kliyan'
 import { Route as AuthenticatedKliyanListRouteImport } from './routes/_authenticated/kliyan-list'
 import { Route as AuthenticatedPreListRouteImport } from './routes/_authenticated/pre-list'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCapitalRoute = AuthenticatedCapitalRouteImport.update({
+  id: '/capital',
+  path: '/capital',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedKliyanRoute = AuthenticatedKliyanRouteImport.update({
   id: '/kliyan',
@@ -82,6 +88,7 @@ const AuthenticatedSolMemberGroupIdMemberIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/capital': typeof AuthenticatedCapitalRoute
   '/kliyan': typeof AuthenticatedKliyanRoute
   '/kliyan-list': typeof AuthenticatedKliyanListRoute
   '/pre-list': typeof AuthenticatedPreListRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/capital': typeof AuthenticatedCapitalRoute
   '/kliyan': typeof AuthenticatedKliyanRoute
   '/kliyan-list': typeof AuthenticatedKliyanListRoute
   '/pre-list': typeof AuthenticatedPreListRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/capital': typeof AuthenticatedCapitalRoute
   '/_authenticated/kliyan': typeof AuthenticatedKliyanRoute
   '/_authenticated/kliyan-list': typeof AuthenticatedKliyanListRoute
   '/_authenticated/pre-list': typeof AuthenticatedPreListRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/capital'
     | '/kliyan'
     | '/kliyan-list'
     | '/pre-list'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/capital'
     | '/kliyan'
     | '/kliyan-list'
     | '/pre-list'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/capital'
     | '/_authenticated/kliyan'
     | '/_authenticated/kliyan-list'
     | '/_authenticated/pre-list'
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/capital': {
+      id: '/_authenticated/capital'
+      path: '/capital'
+      fullPath: '/capital'
+      preLoaderRoute: typeof AuthenticatedCapitalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/kliyan': {
       id: '/_authenticated/kliyan'
@@ -246,6 +265,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCapitalRoute: typeof AuthenticatedCapitalRoute
   AuthenticatedKliyanRoute: typeof AuthenticatedKliyanRoute
   AuthenticatedKliyanListRoute: typeof AuthenticatedKliyanListRoute
   AuthenticatedPreListRoute: typeof AuthenticatedPreListRoute
@@ -258,6 +278,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCapitalRoute: AuthenticatedCapitalRoute,
   AuthenticatedKliyanRoute: AuthenticatedKliyanRoute,
   AuthenticatedKliyanListRoute: AuthenticatedKliyanListRoute,
   AuthenticatedPreListRoute: AuthenticatedPreListRoute,

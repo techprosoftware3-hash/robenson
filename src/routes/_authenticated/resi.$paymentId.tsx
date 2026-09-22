@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Printer } from "lucide-react";
+import { Printer, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, Card, buttonClass } from "@/components/AppShell";
@@ -64,6 +64,13 @@ function ReceiptPage() {
 
   return (
     <AppShell title="Resi peman">
+      <Link
+        to="/admin/$clientId"
+        params={{ clientId: payment.client_id }}
+        className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all print:hidden"
+      >
+        <ArrowLeft className="size-4" /> Retounen
+      </Link>
       <Card className="space-y-4 print:border-0">
         <div className="text-center">
           <h2 className="text-xl font-bold">RAMA Multi-services</h2>

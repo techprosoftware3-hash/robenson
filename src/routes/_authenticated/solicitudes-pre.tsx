@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, DollarSign, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, DollarSign, Calendar, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, Card, buttonClass, inputClass } from "@/components/AppShell";
@@ -115,8 +115,14 @@ function LoanRequestsPage() {
   return (
     <AppShell title="demand prè">
       <div className="space-y-5">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         {/* Filtros */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             className={`px-4 py-2 rounded-lg border-2 ${
               filter === "all" ? "border-green-500 bg-green-50 text-green-800" : "border-gray-300 text-gray-700"

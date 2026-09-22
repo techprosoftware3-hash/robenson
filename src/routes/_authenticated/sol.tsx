@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Users, Plus, Edit, Trash2, Calendar, DollarSign, RotateCw, Search, Eye, EyeOff, CheckCircle, XCircle, ChevronDown } from "lucide-react";
+import { Users, Plus, Edit, Trash2, Calendar, DollarSign, RotateCw, Search, Eye, EyeOff, CheckCircle, XCircle, ChevronDown, ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, Card, Field, buttonClass, inputClass, secondaryButtonClass } from "@/components/AppShell";
@@ -177,6 +177,73 @@ function SolSystem() {
       if (error) throw error;
       toast.success(`Mwa ${monthNumber} komplè.`);
       queryClient.invalidateQueries({ queryKey: ["sol-payments"] });
+      queryClient.invalidateQueries({ queryKey: ["sol-payments-modal"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gen yon pwoblèm.");
+    }
+  }
+
+  async function handlePayment(groupId: string, memberId: string, monthNumber: number, monthlyAmount: number) {
+    try {
+      const { data: existingPayment } = await supabase
+        .from("sol_payments" as any)
+        .select("*")
+        .eq("group_id", groupId)
+        .eq("member_id", memberId)
+        .eq("month_number", monthNumber)
+        .maybeSingle();
+
+      let error;
+      if (existingPayment) {
+        const result = await supabase
+          .from("sol_payments" as any)
+          .update({
+            amount: monthlyAmount,
+            paid: true,
+            paid_at: new Date().toISOString(),
+          })
+          .eq("id", (existingPayment as any).id);
+        error = result.error;
+      } else {
+        const result = await supabase
+          .from("sol_payments" as any)
+          .insert({
+            group_id: groupId,
+            member_id: memberId,
+            month_number: monthNumber,
+            amount: monthlyAmount,
+            paid: true,
+            paid_at: new Date().toISOString(),
+          });
+        error = result.error;
+      }
+
+      if (error) throw error;
+      toast.success(`Peyman mwa ${monthNumber} anrejistre.`);
+      queryClient.invalidateQueries({ queryKey: ["sol-payments-modal"] });
+      queryClient.invalidateQueries({ queryKey: ["sol-payments"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gen yon pwoblèm.");
+    }
+  }
+
+  async function handleUnpay(groupId: string, memberId: string, monthNumber: number) {
+    try {
+      const { error } = await supabase
+        .from("sol_payments" as any)
+        .update({
+          paid: false,
+          paid_at: null,
+          amount: 0,
+        })
+        .eq("group_id", groupId)
+        .eq("member_id", memberId)
+        .eq("month_number", monthNumber);
+
+      if (error) throw error;
+      toast.success(`Peyman mwa ${monthNumber} anile.`);
+      queryClient.invalidateQueries({ queryKey: ["sol-payments-modal"] });
+      queryClient.invalidateQueries({ queryKey: ["sol-payments"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gen yon pwoblèm.");
     }
@@ -185,6 +252,12 @@ function SolSystem() {
   return (
     <AppShell title="SòL — Préstamo Rotativo">
       <div className="space-y-5">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 transition-all"
+        >
+          <ArrowLeft className="size-4" /> Retounen
+        </Link>
         {isAdmin ? (
           <>
             <div className="flex items-center justify-between">
@@ -472,29 +545,37 @@ function SolSystem() {
                               Gere peyman
                             </Link>
                           </div>
-                          <div className="grid grid-cols-6 gap-1">
+                          <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
                             {Array.from({ length: (selectedGroup as any).months }).map((_, monthIndex) => {
                               const payment = (payments as any)?.find(
                                 (p: any) => p.member_id === (member as any).id && p.month_number === monthIndex + 1
                               );
                               const visibleMembers = (members ?? []).filter((m: any) => !m.hidden);
                               const isRecipient = visibleMembers[monthIndex % visibleMembers.length]?.id === (member as any).id;
+                              const monthNumber = monthIndex + 1;
 
                               return (
-                                <div
+                                <button
                                   key={monthIndex}
-                                  className={`flex flex-col items-center p-2 rounded-lg text-center ${
+                                  onClick={() => {
+                                    if ((payment as any)?.paid) {
+                                      handleUnpay((selectedGroup as any).id, (member as any).id, monthNumber);
+                                    } else {
+                                      handlePayment((selectedGroup as any).id, (member as any).id, monthNumber, (selectedGroup as any).monthly_amount);
+                                    }
+                                  }}
+                                  className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all hover:shadow-md ${
                                     (payment as any)?.paid
-                                      ? "bg-green-100 border-green-300"
+                                      ? "bg-green-100 border-green-300 hover:bg-green-200"
                                       : isRecipient
-                                      ? "bg-orange-100 border-orange-300"
-                                      : "bg-gray-50 border-gray-200"
-                                  } border`}
+                                      ? "bg-orange-100 border-orange-300 hover:bg-orange-200"
+                                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                                  }`}
                                 >
-                                  <span className="text-xs font-semibold">{monthIndex + 1}</span>
+                                  <span className="text-xs font-semibold">{monthNumber}</span>
                                   {(payment as any)?.paid && <CheckCircle className="size-3 text-green-600" />}
                                   {isRecipient && !(payment as any)?.paid && <DollarSign className="size-3 text-orange-600" />}
-                                </div>
+                                </button>
                               );
                             })}
                           </div>
@@ -528,23 +609,31 @@ function SolSystem() {
                       <p className="font-semibold text-green-800">{(member as any).name}</p>
                       <p className="text-xs text-green-600">{(member as any).phone || "Pa gen telefòn"}</p>
                     </div>
-                    <div className="grid grid-cols-6 gap-1">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
                       {Array.from({ length: (modalGroup as any).months }).map((_, monthIndex) => {
                         const payment = (modalPayments as any)?.find(
                           (p: any) => p.member_id === (member as any).id && p.month_number === monthIndex + 1
                         );
+                        const monthNumber = monthIndex + 1;
                         return (
-                          <div
+                          <button
                             key={monthIndex}
-                            className={`flex flex-col items-center p-2 rounded-lg text-center border ${
+                            onClick={() => {
+                              if ((payment as any)?.paid) {
+                                handleUnpay((modalGroup as any).id, (member as any).id, monthNumber);
+                              } else {
+                                handlePayment((modalGroup as any).id, (member as any).id, monthNumber, (modalGroup as any).monthly_amount);
+                              }
+                            }}
+                            className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all hover:shadow-md ${
                               (payment as any)?.paid
-                                ? "bg-green-100 border-green-300"
-                                : "bg-gray-50 border-gray-200"
+                                ? "bg-green-100 border-green-300 hover:bg-green-200"
+                                : "bg-gray-50 border-gray-200 hover:bg-gray-100"
                             }`}
                           >
-                            <span className="text-xs font-semibold">{monthIndex + 1}</span>
+                            <span className="text-xs font-semibold">{monthNumber}</span>
                             {(payment as any)?.paid && <CheckCircle className="size-3 text-green-600" />}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>

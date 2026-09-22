@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronRight, Plus, Search } from "lucide-react";
+import { ChevronRight, Plus, Search, DollarSign } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { createClientAccount } from "@/lib/admin.functions";
@@ -99,7 +99,7 @@ function AdminHome() {
   return (
     <AppShell title="Administratè">
       <div className="space-y-5">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <Stat label="Lajan envesti" value={`${gourdes(invested)} G`} color="from-blue-500 to-blue-600" />
           <Stat label="Bay nan prè" value={`${gourdes(lentOut)} G`} color="from-purple-500 to-purple-600" />
           <Stat label="Lajan antre" value={`${gourdes(collected)} G`} color="from-green-500 to-green-600" />
@@ -108,14 +108,15 @@ function AdminHome() {
           <Stat label="Kès disponib" value={`${gourdes(invested - lentOut + collected)} G`} color="from-pink-500 to-pink-600" />
         </div>
 
-        <CapitalBox
-          entries={data?.capital ?? []}
-          onSaved={() => queryClient.invalidateQueries({ queryKey: ["admin-overview"] })}
-        />
-
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Itilizatè yo ({users.length})</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Link
+              to="/capital"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-orange-400 bg-orange-50 px-3 py-2 text-sm font-medium text-orange-700 shadow-md transition-all hover:bg-orange-100 hover:shadow-lg hover:scale-105"
+            >
+              <DollarSign className="size-4" /> Lajan mwen mete nan prè
+            </Link>
             <Link
               to="/solicitudes-pre"
               className={secondaryButtonClass}
@@ -208,57 +209,6 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
       <p className="text-xs font-medium opacity-90">{label}</p>
       <p className="text-lg font-bold">{value}</p>
     </div>
-  );
-}
-
-function CapitalBox({ entries, onSaved }: { entries: any[]; onSaved: () => void }) {
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase
-      .from("capital_entries")
-      .insert({ amount: Number(amount), note });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    setAmount("");
-    setNote("");
-    toast.success("Lajan envesti ajoute.");
-    onSaved();
-  }
-
-  return (
-    <Card className="space-y-3">
-      <h2 className="font-semibold">Lajan mwen mete nan prè</h2>
-      <form onSubmit={add} className="flex gap-2">
-        <input
-          className={inputClass}
-          type="number"
-          step="0.01"
-          placeholder="Kantite"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-        <input
-          className={inputClass}
-          placeholder="Nòt"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
-        <button className={secondaryButtonClass} disabled={busy}>
-          Ajoute
-        </button>
-      </form>
-      {entries.slice(0, 3).map((c) => (
-        <p key={c.id} className="text-xs text-muted-foreground">
-          {c.entry_date} — {gourdes(c.amount)} G {c.note ? `(${c.note})` : ""}
-        </p>
-      ))}
-    </Card>
   );
 }
 
