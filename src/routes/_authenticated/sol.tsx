@@ -558,19 +558,21 @@ function SolSystem() {
                                 <button
                                   key={monthIndex}
                                   onClick={() => {
+                                    if (!isAdmin) return; // Solo admin puede modificar
                                     if ((payment as any)?.paid) {
                                       handleUnpay((selectedGroup as any).id, (member as any).id, monthNumber);
                                     } else {
                                       handlePayment((selectedGroup as any).id, (member as any).id, monthNumber, (selectedGroup as any).monthly_amount);
                                     }
                                   }}
-                                  className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all hover:shadow-md ${
+                                  disabled={!isAdmin}
+                                  className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all ${
                                     (payment as any)?.paid
                                       ? "bg-green-100 border-green-300 hover:bg-green-200"
                                       : isRecipient
                                       ? "bg-orange-100 border-orange-300 hover:bg-orange-200"
                                       : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                                  }`}
+                                  } ${!isAdmin ? "cursor-not-allowed opacity-70" : "hover:shadow-md"}`}
                                 >
                                   <span className="text-xs font-semibold">{monthNumber}</span>
                                   {(payment as any)?.paid && <CheckCircle className="size-3 text-green-600" />}
@@ -619,17 +621,19 @@ function SolSystem() {
                           <button
                             key={monthIndex}
                             onClick={() => {
+                              if (!isAdmin) return; // Solo admin puede modificar
                               if ((payment as any)?.paid) {
                                 handleUnpay((modalGroup as any).id, (member as any).id, monthNumber);
                               } else {
                                 handlePayment((modalGroup as any).id, (member as any).id, monthNumber, (modalGroup as any).monthly_amount);
                               }
                             }}
-                            className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all hover:shadow-md ${
+                            disabled={!isAdmin}
+                            className={`flex flex-col items-center p-2 rounded-lg text-center border transition-all ${
                               (payment as any)?.paid
                                 ? "bg-green-100 border-green-300 hover:bg-green-200"
                                 : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                            }`}
+                            } ${!isAdmin ? "cursor-not-allowed opacity-70" : "hover:shadow-md"}`}
                           >
                             <span className="text-xs font-semibold">{monthNumber}</span>
                             {(payment as any)?.paid && <CheckCircle className="size-3 text-green-600" />}
