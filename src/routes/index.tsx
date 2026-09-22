@@ -82,9 +82,30 @@ function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-green-50 px-5">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center px-5 relative overflow-hidden">
+      {/* Background image with overlay */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url(https://plus.unsplash.com/premium_photo-1686359754750-05cb4b55f0e7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Zm9uZG8lMjB2ZXJkZXxlbnwwfHwwfHx8MA%3D%3D)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      <div 
+        className="absolute inset-0 z-0 bg-black/20"
+      />
+      <div 
+        className="absolute inset-0 z-0 bg-green-50/20"
+        style={{
+          backdropFilter: 'blur(1px)'
+        }}
+      />
+      
+      <div className="w-full max-w-sm relative z-10">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-green-200">
+          <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-xl">
             <Wallet className="size-8" />
           </div>
@@ -139,6 +160,7 @@ function Login() {
         <p className="mt-4 text-center text-xs text-green-700">
           Tel: (509) 31059832/4290398 0ZDS
         </p>
+        </div>
       </div>
     </div>
   );
