@@ -10,7 +10,13 @@ const usernameSchema = z
   .regex(/^[a-zA-Z0-9._-]+$/, "Sèlman lèt, chif, . _ -");
 
 function toEmail(username: string) {
-  return `${username.trim().toLowerCase()}@manodor.app`;
+  const trimmed = username.trim().toLowerCase();
+  // Si ya es un email válido, devolverlo tal cual
+  if (trimmed.includes('@') && trimmed.includes('.')) {
+    return trimmed;
+  }
+  // Si no es email, convertir al formato @manodor.app
+  return `${trimmed.replace(/[^a-z0-9._-]/g, "")}@manodor.app`;
 }
 
 async function assertAdmin(supabase: any, userId: string) {

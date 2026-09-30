@@ -45,7 +45,13 @@ export function gourdes(n: number | string | null | undefined): string {
 }
 
 export function usernameToEmail(username: string): string {
-  return `${username.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "")}@manodor.app`;
+  const trimmed = username.trim().toLowerCase();
+  // Si ya es un email válido, devolverlo tal cual
+  if (trimmed.includes('@') && trimmed.includes('.')) {
+    return trimmed;
+  }
+  // Si no es email, convertir al formato @manodor.app
+  return `${trimmed.replace(/[^a-z0-9._-]/g, "")}@manodor.app`;
 }
 
 /**
