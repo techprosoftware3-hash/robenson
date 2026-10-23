@@ -27,14 +27,13 @@ async function assertAdmin(supabase: any, userId: string) {
 
 /** Kreye premye kont admin nan — sèlman si pa gen okenn admin ki egziste. */
 export const bootstrapAdmin = createServerFn({ method: "POST" })
-  .inputValidator((input: { username: string; password: string; fullName: string }) =>
+  .validator(
     z
       .object({
         username: usernameSchema,
         password: z.string().min(6),
         fullName: z.string().min(2),
       })
-      .parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -72,27 +71,17 @@ export const adminExists = createServerFn({ method: "GET" }).handler(async () =>
 /** Admin kreye yon nouvo kont kliyan oswa administratè. */
 export const createClientAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: {
-      username: string;
-      password: string;
-      fullName: string;
-      phone?: string;
-      idCard?: string;
-      address?: string;
-      role?: "client" | "admin";
-    }) =>
-      z
-        .object({
-          username: usernameSchema,
-          password: z.string().min(4),
-          fullName: z.string().min(2),
-          phone: z.string().optional(),
-          idCard: z.string().optional(),
-          address: z.string().optional(),
-          role: z.enum(["client", "admin"]).optional(),
-        })
-        .parse(input),
+  .validator(
+    z
+      .object({
+        username: usernameSchema,
+        password: z.string().min(4),
+        fullName: z.string().min(2),
+        phone: z.string().optional(),
+        idCard: z.string().optional(),
+        address: z.string().optional(),
+        role: z.enum(["client", "admin"]).optional(),
+      })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
@@ -125,9 +114,7 @@ export const createClientAccount = createServerFn({ method: "POST" })
 /** Admin chanje kòd sekrè yon kliyan. */
 export const resetClientPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { clientId: string; password: string }) =>
-    z.object({ clientId: z.string().uuid(), password: z.string().min(4) }).parse(input),
-  )
+  .validator(z.object({ clientId: z.string().uuid(), password: z.string().min(4) }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -141,9 +128,7 @@ export const resetClientPassword = createServerFn({ method: "POST" })
 /** Admin efase yon kliyan nèt. */
 export const deleteClientAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { clientId: string }) =>
-    z.object({ clientId: z.string().uuid() }).parse(input),
-  )
+  .validator(z.object({ clientId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -155,9 +140,7 @@ export const deleteClientAccount = createServerFn({ method: "POST" })
 /** Admin efase yon peman. */
 export const deletePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { paymentId: string }) =>
-    z.object({ paymentId: z.string().uuid() }).parse(input),
-  )
+  .validator(z.object({ paymentId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
