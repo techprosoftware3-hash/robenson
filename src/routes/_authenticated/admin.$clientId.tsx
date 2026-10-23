@@ -424,7 +424,7 @@ function NewLoanForm({ clientId, onSaved }: { clientId: string; onSaved: () => v
             required
           />
         </Field>
-        <Field label="Enterè (%)">
+        <Field label="kantite lajan pa jou">
           <input
             className={inputClass}
             type="number"

@@ -409,7 +409,7 @@ function LoanRequestForm({ onDone }: { onDone: () => void }) {
             required
           />
         </Field>
-        <Field label="Enterè (%)">
+        <Field label="kantite lajan pa jou">
           <input
             className={inputClass}
             type="number"

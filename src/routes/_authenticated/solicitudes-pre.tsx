@@ -188,7 +188,7 @@ function LoanRequestsPage() {
                     <p className="font-bold text-green-800">{gourdes(request.principal)} G</p>
                   </div>
                   <div className="bg-white rounded-lg p-2 border border-green-200">
-                    <p className="text-xs text-green-600">Enterè</p>
+                    <p className="text-xs text-green-600">kantite lajan pa jou</p>
                     <p className="font-bold text-green-800">{request.interest_rate}%</p>
                   </div>
                   <div className="bg-white rounded-lg p-2 border border-green-200">
